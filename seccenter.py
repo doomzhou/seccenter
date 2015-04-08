@@ -8,6 +8,10 @@
 
 
 from flask import Flask, render_template, g
+import requests
+import re
+import bs4
+from urllib.parse import urlsplit
 import sqlite3
 import os.path
 import feedparser
@@ -57,7 +61,7 @@ def query_db(query, args=(), one=False):
 def populate_database():
     init_db()
     if data_is_stale():
-        load_github()
+        load_vul()
 
 
 def data_is_stale():
@@ -96,6 +100,58 @@ def load_github():
     g.db.commit()
 
 
+def load_vul():
+    urls = [{'name': 'wooyun',
+            'url': 'http://wooyun.org/bugs/new_submit/page/1'},
+            {'name': 'loudong',
+            'url': 'http://loudong.360.cn/vul/list/page/1'},
+            {'name': 'vulbox',
+            'url': 'https://www.vulbox.com/board/internet/page/1'}
+            ]
+    headers = {
+        'user-agent': 'Mozilla/5.0 (Macintosh; Intel Archlinux) " + "Apple\
+        WebKit537.36 (KHTML, like Gecko) Mozilla/5.0 (X11; " + "Linux\
+        x86_64;rv:35.0)Gecko/20100101 Firefox/35.0'
+    }
+    pattern = re.compile('.*平安.*', re.I)
+    entries = []
+    for i in urls:
+        url = i['url']
+        domain = "{0.scheme}://{0.netloc}/".format(urlsplit(url))
+        r = requests.get(url, headers=headers)
+        result = pattern.findall(r.text)
+        if len(pattern.findall(r.text)) != 0:
+            for j in result:
+                soup = bs4.BeautifulSoup(str(j))
+                for k in soup.select('a'):
+                    url = k.attrs.get('href')
+                    text = k.string
+                    source = i['name']
+                    entries.append({
+                        'link': "%s%s" % (domain, url),
+                        'title': text,
+                        'source': source}
+                        )
+
+    for entry in entries:
+        try:
+            g.db.cursor().execute(
+                'INSERT INTO entries VALUES (?, ?, ?, ?, ?, ?, ?)', (
+                    None,
+                    entry['link'],
+                    "http://127.0.0.1:5000/static/cog.png",
+                    entry['title'],
+                    entry['source'],
+                    datetime.now(),
+                    #datetime.strptime(entry['updated'][:-1], '%Y-%m-%dT%H:%M:%S'),
+                    datetime.now()
+                )
+            )
+        except:
+            pass
+    g.db.commit()
+
+
 @app.before_request
 def before_request():
     init_db()
@@ -111,8 +167,9 @@ def after_request(response):
 @app.route('/')
 def index():
     populate_database()
-    results = query_db("select * from entries order by updated desc")
+    results = query_db("select * from entries order by updated desc limit 20")
     return render_template('index.html', results=results)
+
 
 if __name__ == '__main__':
     app.run()

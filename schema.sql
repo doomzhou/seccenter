@@ -2,7 +2,7 @@ drop table if exists entries;
 
 create table entries (
 	id integer primary key autoincrement,
-	url string not null,
+	url string not null UNIQUE,
         image_url string not null,
         excerpt string not null,
         source string not null,
