@@ -78,7 +78,7 @@ def data_is_stale():
 
 
 def load_github():
-    github = feedparser.parse("http://github.com/sharms.atom")
+    github = feedparser.parse("http://github.com/doomzhou.atom")
     g.db.cursor().execute('DELETE FROM entries WHERE source = "github"')
 
     for entry in github.entries:
