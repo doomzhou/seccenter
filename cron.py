@@ -82,7 +82,7 @@ def load_vul():
             db.commit()
             db.close()
         except Exception as e:
-            print(e)
+            print("%s: %s" % (entry['link'], e))
             pass
 
 if __name__ == "__main__":

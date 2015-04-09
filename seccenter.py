@@ -8,11 +8,8 @@
 
 
 from flask import Flask, render_template, g
-from urllib.parse import urlsplit
 import sqlite3
 import os.path
-import feedparser
-from datetime import datetime
 
 
 DATABASE = 'example.db'
@@ -55,100 +52,6 @@ def query_db(query, args=(), one=False):
     return (rv[0] if rv else None) if one else rv
 
 
-def populate_database():
-    init_db()
-    if data_is_stale():
-        load_vul()
-
-
-def data_is_stale():
-    """Find the last entry in the sqlite database to determine if we need to
-    refresh the data.  This stops us from pulling them each request"""
-    try:
-        last_updated = g.db.cursor().execute(
-                'select last_refresh from entries\
-                        order by last_refresh desc limit 1'
-                ).fetchone()[0]
-    except:
-        return True
-
-    if not last_updated or (datetime.now() - last_updated).seconds > 10800:
-        return True
-
-    return False
-
-
-def load_github():
-    github = feedparser.parse("http://github.com/doomzhou.atom")
-    g.db.cursor().execute('DELETE FROM entries WHERE source = "github"')
-
-    for entry in github.entries:
-        g.db.cursor().execute(
-            'INSERT INTO entries VALUES (?, ?, ?, ?, ?, ?, ?)', (
-                None,
-                entry['link'],
-                "http://127.0.0.1:5000/static/cog.png",
-                entry['title'],
-                "github",
-                datetime.strptime(entry['updated'][:-1], '%Y-%m-%dT%H:%M:%S'),
-                datetime.now()
-            )
-        )
-    g.db.commit()
-
-
-def load_vul():
-    urls = [{'name': 'wooyun',
-            'url': 'http://wooyun.org/bugs/new_submit/page/1'},
-            {'name': 'loudong',
-            'url': 'http://loudong.360.cn/vul/list/page/1'},
-            {'name': 'vulbox',
-            'url': 'https://www.vulbox.com/board/internet/page/1'}
-            ]
-    headers = {
-        'user-agent': 'Mozilla/5.0 (Macintosh; Intel Archlinux) " + "Apple\
-        WebKit537.36 (KHTML, like Gecko) Mozilla/5.0 (X11; " + "Linux\
-        x86_64;rv:35.0)Gecko/20100101 Firefox/35.0'
-    }
-    pattern = re.compile('.*平安.*', re.I)
-    entries = []
-    for i in urls:
-        url = i['url']
-        domain = "{0.scheme}://{0.netloc}/".format(urlsplit(url))
-        r = requests.get(url, headers=headers)
-        result = pattern.findall(r.text)
-        if len(pattern.findall(r.text)) != 0:
-            for j in result:
-                soup = bs4.BeautifulSoup(str(j))
-                for k in soup.select('a'):
-                    url = k.attrs.get('href')
-                    text = k.string
-                    source = i['name']
-                    entries.append({
-                        'link': "%s%s" % (domain, url),
-                        'title': text,
-                        'source': source}
-                        )
-
-    for entry in entries:
-        try:
-            g.db.cursor().execute(
-                'INSERT INTO entries VALUES (?, ?, ?, ?, ?, ?, ?)', (
-                    None,
-                    entry['link'],
-                    "http://127.0.0.1:5000/static/cog.png",
-                    entry['title'],
-                    entry['source'],
-                    datetime.now(),
-                    #datetime.strptime(entry['updated'][:-1], '%Y-%m-%dT%H:%M:%S'),
-                    datetime.now()
-                )
-            )
-        except:
-            pass
-    g.db.commit()
-
-
 @app.before_request
 def before_request():
     init_db()
@@ -165,6 +68,30 @@ def after_request(response):
 def index():
     results = query_db("select * from entries order by updated desc limit 20")
     return render_template('index.html', results=results)
+
+
+@app.route('/papers')
+def papers():
+    results = query_db("select * from entries order by updated desc limit 1")
+    return render_template('papers.html', results=results)
+
+
+@app.route('/vuls')
+def vuls():
+    results = query_db("select * from entries where id=3")
+    return render_template('vuls.html', results=results)
+
+
+@app.route('/whitehats')
+def whitehats():
+    results = query_db("select * from entries where id=4")
+    return render_template('whitehats.html', results=results)
+
+
+@app.route('/tools')
+def tools():
+    results = query_db("select * from entries where id=5")
+    return render_template('tools.html', results=results)
 
 
 if __name__ == '__main__':
