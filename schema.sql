@@ -9,3 +9,10 @@ create table entries (
         updated timestamp not null,
         last_refresh timestamp not null);
         	 
+drop table if exists papers;
+
+create table papers (
+	id integer primary key autoincrement,
+    title string not null,
+    updated timestamp not null,
+    content BLOB);

@@ -3,8 +3,8 @@
 	<head>
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 		<title>资料-Sec.ipo.com</title>
-		<link rel="stylesheet" href="http://127.0.0.1:5000/static/reset.css" /> 
-		<link rel="stylesheet" href="http://127.0.0.1:5000/static/text.css" /> 
+		<link rel="stylesheet" href="/static/reset.css" /> 
+		<link rel="stylesheet" href="/static/text.css" /> 
     <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
 	</head>
 	<body>
@@ -14,12 +14,12 @@
 			</div>
 			<div class="clear"></div>
 			<div class="grid_9" id="rss-updates">
-				<h2>Papers list</h2>
-		<ul>
-			{% for result in results %}
-      <li><img src="{{ result.image_url }}" alt="{{ result.source }}" title="{{ result.id }}" class="li-img" /><i style="font-size: 78%;">{{ result.updated|datetimeformat }}</i> {{ result.title }} <a href="/papers/{{result.id}}" style="font-size: 78%">more</a></li>
-			{% endfor %}
-		</ul>
+        <h2>{{ results[0].title }}</h2>
+
+        {% filter markdown %}
+        {{ results[0].content }}
+        {% endfilter %}
+
     <div align="center"><a href='#'>撰写</a></div>
 			</div>
 			<div class="grid_3" id="about">
