@@ -8,6 +8,7 @@
 
 
 from flask import Flask, render_template, g
+from flaskext.markdown import Markdown
 import sqlite3
 import os.path
 
@@ -18,6 +19,7 @@ SECRET_KEY = 'NWUwZT@5YzQ5NzgzNzA3%'
 
 app = Flask(__name__)
 app.config.from_object(__name__)
+Markdown(app)
 
 
 @app.template_filter('datetimeformat')
@@ -72,10 +74,14 @@ def index():
 
 @app.route('/papers')
 def papers():
-    results = query_db("select * from entries order by updated desc limit 1")
+    results = query_db("select * from papers order by updated desc limit 5")
     return render_template('papers.html', results=results)
 
 
+@app.route('/papers/<id>')
+def paper(id):
+    results = query_db("select * from papers where id=%s" % id)
+    return render_template('paper.html', results=results)
 @app.route('/vuls')
 def vuls():
     results = query_db("select * from entries where id=3")
