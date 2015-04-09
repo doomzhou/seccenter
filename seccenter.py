@@ -8,9 +8,6 @@
 
 
 from flask import Flask, render_template, g
-import requests
-import re
-import bs4
 from urllib.parse import urlsplit
 import sqlite3
 import os.path
@@ -166,7 +163,6 @@ def after_request(response):
 
 @app.route('/')
 def index():
-    populate_database()
     results = query_db("select * from entries order by updated desc limit 20")
     return render_template('index.html', results=results)
 
