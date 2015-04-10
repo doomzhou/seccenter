@@ -86,19 +86,19 @@ def paper(id):
 
 @app.route('/vuls')
 def vuls():
-    results = query_db("select * from entries where id=3")
+    results = query_db("select * from entries order by updated desc limit 20")
     return render_template('vuls.html', results=results)
 
 
 @app.route('/whitehats')
 def whitehats():
-    results = query_db("select * from entries where id=4")
+    results = query_db("select * from entries where id=1004")
     return render_template('whitehats.html', results=results)
 
 
 @app.route('/tools')
 def tools():
-    results = query_db("select * from entries where id=5")
+    results = query_db("select * from entries where id=1005")
     return render_template('tools.html', results=results)
 
 
