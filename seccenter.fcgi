@@ -1,13 +1,15 @@
-#!/www/HomePage/bin/python
-import os
-import sys
-os.environ.setdefault('PATH', '/bin:/usr/bin')
-os.environ['PATH'] = '/www/HomePage/bin:' + os.environ['PATH']
-os.environ['VIRTUAL_ENV'] = '/www/HomePage'
-os.chdir('/www/HomePage')
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+# File Name : seccenter.fcgi
+'''Purpose : Intro sth                                 '''
+# Creation Date : 1428389717
+# Last Modified :
+# Release By : Doom.zhou
 
-sys.path.insert(0, "/www/HomePage")
 
 from flup.server.fcgi import WSGIServer
-from homepage import app
-WSGIServer(app, bindAddress='/tmp/homepage.sock').run()
+from seccenter import app
+
+
+if __name__ == '__main__':
+    WSGIServer(app, bindAddress=('127.0.0.1', 8080)).run()

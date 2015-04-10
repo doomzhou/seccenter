@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-# File Name : 1.py
+# File Name : seccenter.py
 '''Purpose : Intro sth                                 '''
 # Creation Date : 1428389717
 # Last Modified :
@@ -82,6 +82,8 @@ def papers():
 def paper(id):
     results = query_db("select * from papers where id=%s" % id)
     return render_template('paper.html', results=results)
+
+
 @app.route('/vuls')
 def vuls():
     results = query_db("select * from entries where id=3")

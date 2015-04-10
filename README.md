@@ -9,5 +9,4 @@ Intro
     sqlite3
     celery[del]
     Flask-Markdown
-
-
+    flup6

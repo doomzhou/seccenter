@@ -16,9 +16,7 @@
 			<div class="grid_9" id="rss-updates">
         <h2>{{ results[0].title }}</h2>
 
-        {% filter markdown %}
-        {{ results[0].content }}
-        {% endfilter %}
+        {{ results[0].content|markdown }}
 
     <div align="center"><a href='#'>撰写</a></div>
 			</div>
@@ -29,15 +27,15 @@
 				<h2><a href="/">Home</a></h2>
 				<ul id="resources">
 					<li><a href="/vuls">漏洞</a></li>
-					<li><a href="/vuls">资料</a></li>
-					<li><a href="/vuls">贡献人</a></li>
-					<li><a href="/vuls">工具集</a></li>
+					<li><a href="/papers">资料</a></li>
+					<li><a href="/whitehats">贡献人</a></li>
+					<li><a href="/tools">工具集</a></li>
 				</ul>
 				</div>
 			</div>
 			<div class="clear"></div>
 			<div class="grid_12" id="footer">
-        <p>(c) 2010 Doomzhou.  Powered by <a href="http://flash.pocoo.org">Flask</a>.</p>
+        <p>(c) 2015 Doomzhou.  Powered by <a href="http://flash.pocoo.org">Flask</a>.</p>
 			</div>
 		</div>
 	</body>
